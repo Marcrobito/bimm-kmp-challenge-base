@@ -1,34 +1,83 @@
-# Bimm KMP Take Home Assignment - Base repo
 
-IMPORTANT: Don't create a PR to this repo with your solution.
+# Bimm KMP Challenge
 
-# Assignment instructions
-You should have received a separate description for your assignment. If you haven't, please contact the member of the hiring team you're in touch with.
+A multiplatform mobile application built with **Kotlin Multiplatform** (KMP), displaying a list of sake shops with images, ratings, locations, and helpful links. The project shares business logic across Android and iOS to reduce code duplication and increase maintainability.
 
-Also please verify you have received any files (JSON, xml, csv, txt, images, depending on the assignment) or any API addresses you assignment mentions. Those vary with the position you're applying to.
+## 🧱 Project Structure
 
+- **shared**: Common KMP module with business logic, models, repositories, and JSON loading.
+- **androidApp / composeApp**: Android app written using Jetpack Compose.
+- **iosApp**: iOS app written in SwiftUI, integrating the `shared` module via Kotlin Native.
 
-# Assignment deliver instructions
-[Fork](https://github.com/reul/bimm-kmp-challenge-base/fork) or clone this repo and add the necessary code to complete your assignment, then email us with the link of the forked repo or to a zip or tarball file we can download and evaluate.
+## 🛠️ Technologies & Libraries
 
-It's very important that we can run the project and see it being executed ourselves, so don't make it dependent on any private repos or environment variables we might not have access to or, if you must, include an APK in the tarball or in a GitHub release in your fork. Don't forget to include or stage any other dependencies (like json files).
+- **Kotlin Multiplatform**
+- **Jetpack Compose** for Android UI
+- **SwiftUI** for iOS UI
+- **Koin** for dependency injection (Android only)
+- **Kotlinx Serialization** for JSON parsing
+- **Turbine** + **kotlinx.coroutines.test** for unit testing
+- **Coil** for image loading on Android
+- **AsyncImage** for remote image loading on iOS
 
-## Build instructions
-This is a Kotlin Multiplatform project targeting Android, iOS.
+## 🔄 Architecture
 
-* `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - `commonMain` is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    `iosMain` would be the right folder for such calls.
+- MVVM-like architecture: `ViewModel` → `State` → `UI`
+- `SakeShopsRepository` abstracts data sources
+- `SakeShopDatasource` loads from a local JSON file (`sakeshop.json`)
+- On Android, dependency injection is handled with **Koin**
+- On iOS, Koin was replaced with a manual factory (`SharedFactory`) due to compatibility issues
 
-* `/iosApp` contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform, 
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+## 📱 Features
 
-* `/shared` is for the code that will be shared between all targets in the project.
-  The most important subfolder is `commonMain`. If preferred, you can add code to the platform-specific folders here too.
+- Sake shops list view
+- Detail screen with:
+  - Featured image
+  - Address and rating
+  - Description
+  - Website and map links
 
+## 🧪 Unit Testing
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+### Shared Module
 
+- DTO to Domain mapping
+- `SakeShopLocalDatasource` with `JsonProvider`
+- `SakeShopRepositoryImpl`
+- `SharedFactory`
+
+### Android
+
+- `SakeShopsViewModel` tested with `Turbine` and fake repository
+
+> A basic iOS ViewModel test was added. UI tests were not included due to time constraints.
+
+## ⚠️ Notes
+
+- **Koin was not integrated in iOS**: Attempts to use `startKoin` from Swift failed due to native binding limitations and time constraints. `SharedFactory` was used instead.
+- **JSON loading on iOS** is handled from the app bundle directly because the initial intent to centralize it in `shared` was not feasible under current KMP limitations.
+- The property `description_` was used in Swift to avoid naming collisions with `NSObject.description`.
+
+## ⌛ Time & Scope Considerations
+
+- Priority was given to delivering a functional cross-platform solution.
+- Some architectural choices (e.g. multiple datasources) were simplified to fit the project timeline.
+- Both UIs were aligned visually with slight platform-specific adaptations.
+
+## 📂 Resources
+
+- `sakeshop.json`: source data for the app.
+- Images: handled via Coil (Android) and `AsyncImage` (iOS). A local placeholder image named `sake` is provided.
+
+## 🚀 Running the App
+
+### Android
+
+```bash
+./gradlew composeApp:installDebug
+```
+
+### iOS
+
+1. Open `iosApp.xcodeproj` or `.xcworkspace` in Xcode
+2. Choose a simulator and run the app
