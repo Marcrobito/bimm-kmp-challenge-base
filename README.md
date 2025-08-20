@@ -78,6 +78,41 @@ A multiplatform mobile application built with **Kotlin Multiplatform** (KMP), di
 ```
 
 ### iOS
+# Build shared framework for simulator
+```bash
+./gradlew :shared:linkReleaseFrameworkIosSimulatorArm64
+```
+# Open default simulator
+```bash
+open -a Simulator
+```
 
-1. Open `iosApp.xcodeproj` or `.xcworkspace` in Xcode
-2. Choose a simulator and run the app
+# Move into iOS project
+```bash
+cd iosApp
+```
+
+# Build the iOS app for simulator
+```bash
+xcodebuild -project iosApp.xcodeproj -scheme iosApp -configuration Debug -sdk iphonesimulator -derivedDataPath build build
+```
+
+# Find the app path (first .app found)
+```bash
+APP_PATH="$(find build -type d -name '*.app' | head -n1)"
+```
+
+# Install on the currently booted simulator
+```bash
+xcrun simctl install booted "$APP_PATH"
+```
+
+# Get the Bundle ID from Info.plist
+```bash
+BUNDLE_ID=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP_PATH/Info.plist")
+```
+
+# Launch the app in the simulator
+```bash
+xcrun simctl launch booted "$BUNDLE_ID"
+```

@@ -46,6 +46,13 @@ kotlin {
             implementation(libs.kotlinx.coroutines.test)
             implementation(libs.turbine)
         }
+        androidInstrumentedTest.dependencies {
+            implementation(libs.androidx.ui.test.junit4)
+            implementation(libs.androidx.espresso.intents)
+            implementation(libs.androidx.junit.v130)
+            implementation(libs.mockito.android)
+            implementation(libs.mockito.kotlin)
+        }
     }
 }
 
